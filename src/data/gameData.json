@@ -1,0 +1,252 @@
+{
+  "levels": [
+    {"level": 1, "xp": 0,    "title": "Doodler",      "emoji": "✏️"},
+    {"level": 2, "xp": 200,  "title": "Sketchling",   "emoji": "🎨"},
+    {"level": 3, "xp": 500,  "title": "Sticker Witch","emoji": "🌟"},
+    {"level": 4, "xp": 1000, "title": "Shop Keeper",  "emoji": "🛍️"},
+    {"level": 5, "xp": 1800, "title": "Brand Babe",   "emoji": "✨"},
+    {"level": 6, "xp": 2800, "title": "Dream Maker",  "emoji": "🌈"},
+    {"level": 7, "xp": 4000, "title": "Artisan",      "emoji": "👑"}
+  ],
+
+  "levelMessages": {
+    "2": "you showed up twice now. that means you're actually doing this. things are happening. 🌸",
+    "3": "sticker witch. you have designs. you're making things with intention. ✨",
+    "4": "shop keeper. you have a real shop with real listings and real people who found you. 🛍️",
+    "5": "brand babe. you know who you are now. fairy lights are up because your space deserves to feel magical. ✨",
+    "6": "dream maker. you've been building this quietly and now it's big enough. you're running a business. 🌈",
+    "7": "artisan. you made it the whole way. 90 days of showing up. the neon sign is on. 👑"
+  },
+
+  "realWorldRewards": {
+    "3": "real world reward 🌸 treat yourself to a new Procreate brush pack or a $10 sticker haul.",
+    "5": "real world reward ✨ buy something for your desk setup — a new notebook, a plant, whatever makes your space yours.",
+    "7": "real world reward 👑 this one's big — a new iPad accessory, a market table booking. you're a real business."
+  },
+
+  "badges": [
+    {"id": "first_mark",        "icon": "✏️",  "name": "First Mark",        "desc": "Complete Day 1",                     "xp": 50,   "cat": "journey"},
+    {"id": "shop_is_real",      "icon": "🛍️",  "name": "Shop is Real",      "desc": "Publish your first listing",         "xp": 75,   "cat": "milestone"},
+    {"id": "first_post",        "icon": "⭐",  "name": "First Post",        "desc": "Post your first content",            "xp": 50,   "cat": "content"},
+    {"id": "ten_designs",       "icon": "🎨",  "name": "10 Designs",        "desc": "10 designs complete",                "xp": 100,  "cat": "milestone"},
+    {"id": "twenty_listings",   "icon": "✨",  "name": "20 Listings",       "desc": "20 listings live",                   "xp": 150,  "cat": "milestone"},
+    {"id": "batch_queen",       "icon": "📸",  "name": "Batch Queen",       "desc": "Complete a Saturday batch day",      "xp": 75,   "cat": "habit"},
+    {"id": "midpoint",          "icon": "🌙",  "name": "Mid-Point",         "desc": "Reach Day 45",                       "xp": 100,  "cat": "journey"},
+    {"id": "drop_day",          "icon": "🚀",  "name": "Drop Day",          "desc": "Complete a launch",                  "xp": 150,  "cat": "milestone"},
+    {"id": "community_builder", "icon": "💖",  "name": "Community Builder", "desc": "Set up Discord/Ko-fi community",     "xp": 100,  "cat": "milestone"},
+    {"id": "youtube_debut",     "icon": "▶️",  "name": "YouTube Debut",     "desc": "Post first YouTube video",           "xp": 100,  "cat": "content"},
+    {"id": "recovery_queen",    "icon": "🦋",  "name": "Recovery Queen",    "desc": "Complete 3 recovery quests",         "xp": 100,  "cat": "habit"},
+    {"id": "big_sis",           "icon": "🎀",  "name": "Big Sis Energy",    "desc": "Write your origin story post",       "xp": 75,   "cat": "content"},
+    {"id": "finish_line",       "icon": "👑",  "name": "Finish Line",       "desc": "Complete Day 90",                    "xp": 500,  "cat": "journey"},
+    {"id": "first_step",        "icon": "🌱",  "name": "First Step",        "desc": "Complete your first daily quest",    "xp": 50,   "cat": "habit"},
+    {"id": "keep_going",        "icon": "🌷",  "name": "Keep Going",        "desc": "3-day streak",                       "xp": 75,   "cat": "streak"},
+    {"id": "unstoppable",       "icon": "💪",  "name": "Unstoppable",       "desc": "7-day streak",                       "xp": 150,  "cat": "streak"},
+    {"id": "enchanting",        "icon": "🌟",  "name": "Enchanting",        "desc": "14-day streak",                      "xp": 300,  "cat": "streak"},
+    {"id": "legend",            "icon": "👸",  "name": "Legend",            "desc": "30-day streak",                      "xp": 500,  "cat": "streak"},
+    {"id": "dear_diary",        "icon": "📓",  "name": "Dear Diary",        "desc": "Write 5 journal entries",            "xp": 100,  "cat": "journal"},
+    {"id": "novelist",          "icon": "📖",  "name": "Novelist",          "desc": "Write 20 journal entries",           "xp": 250,  "cat": "journal"},
+    {"id": "shutterbug",        "icon": "📷",  "name": "Shutterbug",        "desc": "Complete 5 photo/content tasks",     "xp": 100,  "cat": "content"},
+    {"id": "wall_breaker",      "icon": "💥",  "name": "Wall Breaker",      "desc": "Bust 5 blockers",                    "xp": 100,  "cat": "habit"},
+    {"id": "demolisher",        "icon": "⚡",  "name": "Demolisher",        "desc": "Bust 15 blockers",                   "xp": 250,  "cat": "habit"},
+    {"id": "habit_master",      "icon": "🏆",  "name": "Habit Master",      "desc": "Complete all habits in a day",       "xp": 200,  "cat": "habit"}
+  ],
+
+  "dayThemes": {
+    "0": {"label": "Rest Day",       "icon": "🌿"},
+    "1": {"label": "Design Day",     "icon": "🖊️"},
+    "2": {"label": "Shop Day",       "icon": "🛍️"},
+    "3": {"label": "Design Day",     "icon": "🖊️"},
+    "4": {"label": "Content Day",    "icon": "📱"},
+    "5": {"label": "Community Day",  "icon": "💖"},
+    "6": {"label": "Batch Day",      "icon": "🎨"}
+  },
+
+  "habitQuests": {
+    "0": [
+      {"icon": "📓", "text": "Write a weekly reflection or journal",         "xp": 20},
+      {"icon": "🌿", "text": "Rest and recharge — light creative play only", "xp": 10},
+      {"icon": "🗺️", "text": "Review your roadmap and check progress",       "xp": 15},
+      {"icon": "📚", "text": "Read or watch something that inspires you",    "xp": 10},
+      {"icon": "🎯", "text": "Set 3 intentions for the coming week",         "xp": 15}
+    ],
+    "1": [
+      {"icon": "🖊️", "text": "Complete a full design from scratch",          "xp": 30},
+      {"icon": "🎀", "text": "Design a seasonal sticker concept",            "xp": 25},
+      {"icon": "📐", "text": "Prep files for print-on-demand",               "xp": 20},
+      {"icon": "🌷", "text": "Mock up a new product photo",                  "xp": 20},
+      {"icon": "🌿", "text": "Sketch ideas for a bundle set",                "xp": 15}
+    ],
+    "2": [
+      {"icon": "🛒", "text": "Work on Etsy shop setup or listings",          "xp": 25},
+      {"icon": "🌸", "text": "Create or refine a launch design",             "xp": 25},
+      {"icon": "📦", "text": "Research print-on-demand suppliers",           "xp": 15},
+      {"icon": "📸", "text": "Take product photos or mockups",               "xp": 20},
+      {"icon": "💸", "text": "Review and update your pricing",               "xp": 15}
+    ],
+    "3": [
+      {"icon": "🖊️", "text": "Complete a full design from scratch",          "xp": 30},
+      {"icon": "✏️", "text": "Sketch 3 new concept ideas",                   "xp": 20},
+      {"icon": "🎨", "text": "Experiment with a new colour palette",         "xp": 15},
+      {"icon": "📁", "text": "Organise your Procreate files",                "xp": 10},
+      {"icon": "🖼️", "text": "Create a mockup for a new product",            "xp": 20}
+    ],
+    "4": [
+      {"icon": "📱", "text": "Film or create a content post",                "xp": 25},
+      {"icon": "✍️", "text": "Write 3 captions for upcoming posts",          "xp": 20},
+      {"icon": "📌", "text": "Schedule posts for the week",                  "xp": 15},
+      {"icon": "🎬", "text": "Record a short process video or reel",         "xp": 25},
+      {"icon": "💬", "text": "Engage with 10 comments or accounts",          "xp": 15}
+    ],
+    "5": [
+      {"icon": "💖", "text": "Post in your community or Discord",            "xp": 20},
+      {"icon": "🌸", "text": "Reply to all DMs and comments",                "xp": 15},
+      {"icon": "🎁", "text": "Plan or announce a giveaway or collab",        "xp": 25},
+      {"icon": "📧", "text": "Send a Ko-fi supporter update",                "xp": 20},
+      {"icon": "🤝", "text": "Reach out to 1 potential collab partner",      "xp": 20}
+    ],
+    "6": [
+      {"icon": "🎨", "text": "Batch: create 3+ designs in one session",      "xp": 40},
+      {"icon": "📸", "text": "Film a full batch day vlog or timelapse",      "xp": 25},
+      {"icon": "📦", "text": "Prep and list 2+ products in shop",            "xp": 25},
+      {"icon": "📅", "text": "Plan next week's content calendar",            "xp": 15},
+      {"icon": "🌿", "text": "Organise your digital files and folders",      "xp": 10}
+    ]
+  },
+
+  "challenges": [
+    {"cat": "paralysis buster",  "text": "open Procreate and make exactly ONE mark. that's it. you're done. ✏️"},
+    {"cat": "paralysis buster",  "text": "set a 2-minute timer and sketch whatever is in front of you. no good, no bad."},
+    {"cat": "paralysis buster",  "text": "write the name of ONE design idea in your notes app. just the name. done."},
+    {"cat": "unfinished things", "text": "pick one WIP. finish it ugly. export it. done counts. 🌸"},
+    {"cat": "unfinished things", "text": "set a timer for 25 minutes. work on ONE thing only. when it ends, it's done."},
+    {"cat": "consistency",       "text": "open your sketchbook. put it on your desk. that's it. habit = going. ✨"},
+    {"cat": "consistency",       "text": "post ONE story today. a photo of your desk, your drink, anything. it counts."},
+    {"cat": "self-doubt crusher","text": "screenshot one piece of your art and send it to one person who'd love it. 🌸"},
+    {"cat": "self-doubt crusher","text": "write 2 sentences: one thing you made that you're proud of + why it matters."}
+  ],
+
+  "recoveryQuests": [
+    "write a 3-sentence reflection about what got in the way. no judgment, just honesty.",
+    "post one story to any platform — your mug, your desk, a doodle.",
+    "spend 10 minutes on any design task. even just opening your tools counts.",
+    "answer this: what's one small thing i can protect time for tomorrow?"
+  ],
+
+  "quotes": [
+    "you didn't come this far to only come this far. 🌸",
+    "done is better than perfect. ship the thing.",
+    "your art is worth paying for. don't forget that.",
+    "every sticker you make is a little piece of you in the world. 🌷",
+    "one design at a time. that's the whole strategy.",
+    "the version of you at day 90 is cheering for you right now.",
+    "byjessalyn is becoming real because you keep showing up.",
+    "consistency is just doing the thing on the hard days too.",
+    "your shop isn't competition — it's a gift to the right people. ✨",
+    "mochi believes in you completely. no notes.",
+    "progress over perfection, always.",
+    "you are building something that will outlast this hard day.",
+    "the creative blocks are part of the process. push through anyway.",
+    "someone needs exactly what you make. go make it. 🌸",
+    "rest is productive. your brain is still working.",
+    "small steps every day > one perfect day a month.",
+    "your niche is your superpower. lean in.",
+    "open Procreate. make one mark. the rest follows.",
+    "you don't need to be ready. you just need to start.",
+    "the girl who makes it is the one who keeps going. that's you."
+  ],
+
+  "futureSelfMessages": [
+    "you're already further along than you think.",
+    "the version of you at day 90 is so proud of day-1 you for starting.",
+    "you didn't quit. that's the whole story.",
+    "every sketch, every listing, every post — it added up. it always adds up.",
+    "the sticker shop is real because you made it real. remember that.",
+    "you built this in the pockets of time between everything else. that's not small.",
+    "you showed up on the hard days too. that's what makes this yours.",
+    "someone found your shop today because you posted that thing you almost didn't post.",
+    "mochi is sitting in the window of your storefront. you made that happen. 🌸",
+    "you are so much further than you were. look back and be proud."
+  ],
+
+  "journalPrompts": [
+    "what's one thing you made or did today that you're proud of?",
+    "what felt hard today, and how did you push through?",
+    "what part of your creative process surprised you this week?",
+    "if you could tell day-1 you one thing, what would it be?",
+    "when did creating feel the most fun this week?",
+    "what would you do differently tomorrow?",
+    "what's one small win from today that you almost didn't count?",
+    "how does your creative work make you feel right now?",
+    "what would future you say about today's effort?",
+    "what's something your shop taught you about yourself?"
+  ],
+
+  "roadmap": [
+    {
+      "phase": 1, "emoji": "🌱", "title": "Build the Foundation",
+      "range": "Months 1–6", "income": "$0 → $500/mo",
+      "tasks": [
+        {"text": "Launch Etsy shop with 10–15 designs live",       "tag": "shop"},
+        {"text": "Create 2–3 sticker sheets for launch",           "tag": "products"},
+        {"text": "Set up Ko-fi for community & tips",              "tag": "platforms"},
+        {"text": "Create Redbubble account for passive income",    "tag": "platforms"},
+        {"text": "Get Instagram + TikTok active",                  "tag": "content"},
+        {"text": "Set up Pinterest account",                       "tag": "platforms"},
+        {"text": "Post 3x/week on IG + TikTok",                   "tag": "content"},
+        {"text": "Film first YouTube video",                       "tag": "content"},
+        {"text": "Build Discord server",                           "tag": "community"},
+        {"text": "Die-cut singles priced $4–7 CAD",               "tag": "products"}
+      ]
+    },
+    {
+      "phase": 2, "emoji": "🌸", "title": "Find What Sells",
+      "range": "Months 7–18", "income": "$500 → $2,000/mo",
+      "tasks": [
+        {"text": "Grow to 25–40 total designs live",               "tag": "products"},
+        {"text": "Add sticky notes to shop ($8–12)",               "tag": "products"},
+        {"text": "Create seasonal & limited drops",                "tag": "products"},
+        {"text": "Offer bundle sets ($25–35)",                     "tag": "products"},
+        {"text": "Add digital downloads ($5–8)",                   "tag": "products"},
+        {"text": "Land 2–3 freelance clients/month",               "tag": "freelance"},
+        {"text": "Grow YouTube to 1K subscribers",                 "tag": "content"},
+        {"text": "Launch Ko-fi memberships",                       "tag": "community"},
+        {"text": "Attend 1–2 local markets",                       "tag": "freelance"},
+        {"text": "Reach $500/mo consistent revenue",               "tag": "shop"}
+      ]
+    },
+    {
+      "phase": 3, "emoji": "✨", "title": "Scale & Systematise",
+      "range": "Months 19–36", "income": "$2,000 → $5,000/mo",
+      "tasks": [
+        {"text": "Reach 50+ products across all platforms",        "tag": "products"},
+        {"text": "Grow to $2K+/mo consistently",                  "tag": "shop"},
+        {"text": "Launch Artisan Atelier membership tier",         "tag": "community"},
+        {"text": "Hire help for packaging or admin",               "tag": "shop"},
+        {"text": "Build automated email sequences",                "tag": "content"},
+        {"text": "License designs to brands",                      "tag": "freelance"},
+        {"text": "Attend 4+ markets per year",                     "tag": "freelance"},
+        {"text": "Teach a paid workshop or mini course",           "tag": "community"},
+        {"text": "Reach $5K/mo goal",                              "tag": "shop"},
+        {"text": "Research physical storefront options",           "tag": "shop"}
+      ]
+    }
+  ],
+
+  "defaultFocusBlocks": [
+    {"id": 1, "name": "Design & Illustration",        "icon": "🖊️", "time": "09:00", "dur": 90,  "days": "Mon, Thu",  "color": "#F4A0A0"},
+    {"id": 2, "name": "Week Planning & Journaling",   "icon": "📓", "time": "09:00", "dur": 30,  "days": "Sun",       "color": "#FFE5A0"},
+    {"id": 3, "name": "Etsy Listings & Shop Updates", "icon": "🗓️", "time": "10:00", "dur": 45,  "days": "Tue",       "color": "#A8D8EA"},
+    {"id": 4, "name": "Analytics & Revenue Review",   "icon": "🗓️", "time": "10:00", "dur": 30,  "days": "Fri",       "color": "#A8D8EA"},
+    {"id": 5, "name": "Market Prep & Packaging",      "icon": "🎨", "time": "10:00", "dur": 120, "days": "Sat",       "color": "#C2EDD8"},
+    {"id": 6, "name": "Content Batch — IG + TikTok",  "icon": "🎨", "time": "11:00", "dur": 60,  "days": "Mon, Wed",  "color": "#DDD0F0"},
+    {"id": 7, "name": "Community & Discord Check-in", "icon": "☕", "time": "14:00", "dur": 30,  "days": "Wed, Fri",  "color": "#FFE5A0"}
+  ],
+
+  "themes": [
+    {"id": "default",        "name": "Cream & Pastel",  "swatch": ["#FFFDF8", "#FFD6E8"], "unlock": "always"},
+    {"id": "soft-studio",    "name": "Soft Studio",     "swatch": ["#FDF5EE", "#E8967A"], "unlock": "Day 30 complete"},
+    {"id": "midnight-kawaii","name": "Midnight Kawaii", "swatch": ["#0D1B2E", "#FF8FA8"], "unlock": "7-day streak"},
+    {"id": "blossom",        "name": "Blossom Season",  "swatch": ["#FFF0F5", "#F06090"], "unlock": "Level 4"},
+    {"id": "neon-mochi",     "name": "Neon Mochi",      "swatch": ["#100820", "#FF60C0"], "unlock": "Level 7"}
+  ]
+}
