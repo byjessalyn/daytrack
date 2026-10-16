@@ -48,39 +48,55 @@ function useVisualViewport() {
   }, [])
 }
 
-// Horizontal swipe on the page switches tabs. Ignores mostly-vertical drags,
-// drags that start in a form field or near the screen edge (the system back
-// gesture lives there), and anything while a sheet is open.
-function useSwipe(ref, enabled, onSwipe) {
+// Horizontal swipe anywhere on the screen switches tabs. Listens on the whole
+// document, because short pages leave empty space outside the page content.
+// Ignores mostly-vertical drags, drags that start in a form field, on the tab
+// bar or near the screen edge (the system back gesture lives there), and
+// anything while a sheet is open. A touch that the browser cancels (for
+// example because the page started scrolling) still counts from its last move.
+function useSwipe(enabled, onSwipe) {
   const cb = useRef(onSwipe)
   cb.current = onSwipe
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
+    if (!enabled) return
     let start = null
+    let last = null
     const down = (e) => {
       const t = e.touches[0]
       const edge = 24
-      if (e.touches.length > 1 || t.clientX < edge || t.clientX > window.innerWidth - edge
-        || e.target.closest('input, textarea, select, [data-noswipe]') || document.querySelector('.sheet-backdrop')) {
-        start = null
-        return
-      }
-      start = { x: t.clientX, y: t.clientY, at: Date.now() }
-    }
-    const up = (e) => {
-      if (!start) return
-      const t = e.changedTouches[0]
-      const dx = t.clientX - start.x
-      const dy = t.clientY - start.y
-      const quick = Date.now() - start.at < 700
       start = null
-      if (quick && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.8) cb.current(dx < 0 ? 1 : -1)
+      if (e.touches.length > 1 || t.clientX < edge || t.clientX > window.innerWidth - edge) return
+      if (e.target.closest?.('input, textarea, select, .dock, .sheet-backdrop, [data-noswipe]')) return
+      if (document.querySelector('.sheet-backdrop')) return
+      start = { x: t.clientX, y: t.clientY, at: Date.now() }
+      last = { x: t.clientX, y: t.clientY }
     }
-    el.addEventListener('touchstart', down, { passive: true })
-    el.addEventListener('touchend', up, { passive: true })
-    return () => { el.removeEventListener('touchstart', down); el.removeEventListener('touchend', up) }
-  }, [ref, enabled])
+    const move = (e) => {
+      if (!start) return
+      const t = e.touches[0]
+      last = { x: t.clientX, y: t.clientY }
+    }
+    const finish = (e) => {
+      if (!start) return
+      const t = e.changedTouches?.[0]
+      const end = t ? { x: t.clientX, y: t.clientY } : last
+      const dx = end.x - start.x
+      const dy = end.y - start.y
+      const quick = Date.now() - start.at < 800
+      start = null
+      if (quick && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) cb.current(dx < 0 ? 1 : -1)
+    }
+    document.addEventListener('touchstart', down, { passive: true })
+    document.addEventListener('touchmove', move, { passive: true })
+    document.addEventListener('touchend', finish, { passive: true })
+    document.addEventListener('touchcancel', finish, { passive: true })
+    return () => {
+      document.removeEventListener('touchstart', down)
+      document.removeEventListener('touchmove', move)
+      document.removeEventListener('touchend', finish)
+      document.removeEventListener('touchcancel', finish)
+    }
+  }, [enabled])
 }
 
 function useToday() {
@@ -108,7 +124,6 @@ export default function App() {
   const [checkingIn, setCheckingIn] = useState(false)
   const [talking, setTalking] = useState(false)
   const [slide, setSlide] = useState('')
-  const mainRef = useRef(null)
 
   const goTab = (id) => {
     const from = TABS.findIndex(t => t.id === tab)
@@ -116,7 +131,7 @@ export default function App() {
     setSlide(from >= 0 && to >= 0 && to !== from ? (to > from ? 'slide-next' : 'slide-prev') : '')
     setTab(id)
   }
-  useSwipe(mainRef, !!planner.data, (dir) => {
+  useSwipe(!!planner.data, (dir) => {
     const i = TABS.findIndex(t => t.id === tab)
     if (i < 0) return // settings isn't part of the swipe order
     const next = TABS[i + dir]
@@ -167,7 +182,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <main ref={mainRef} className={`main ${slide}`}>
+      <main className={`main ${slide}`}>
         {tab === 'today' && <TodayView ctx={ctx} />}
         {tab === 'plan' && <PlanView ctx={ctx} />}
         {tab === 'goals' && <GoalsView ctx={ctx} />}
