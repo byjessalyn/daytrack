@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePlanner } from './usePlanner.js'
 import { todayKey } from './lib/dates.js'
 import { onNotificationTap } from './lib/native.js'
@@ -48,6 +48,41 @@ function useVisualViewport() {
   }, [])
 }
 
+// Horizontal swipe on the page switches tabs. Ignores mostly-vertical drags,
+// drags that start in a form field or near the screen edge (the system back
+// gesture lives there), and anything while a sheet is open.
+function useSwipe(ref, enabled, onSwipe) {
+  const cb = useRef(onSwipe)
+  cb.current = onSwipe
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    let start = null
+    const down = (e) => {
+      const t = e.touches[0]
+      const edge = 24
+      if (e.touches.length > 1 || t.clientX < edge || t.clientX > window.innerWidth - edge
+        || e.target.closest('input, textarea, select, [data-noswipe]') || document.querySelector('.sheet-backdrop')) {
+        start = null
+        return
+      }
+      start = { x: t.clientX, y: t.clientY, at: Date.now() }
+    }
+    const up = (e) => {
+      if (!start) return
+      const t = e.changedTouches[0]
+      const dx = t.clientX - start.x
+      const dy = t.clientY - start.y
+      const quick = Date.now() - start.at < 700
+      start = null
+      if (quick && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.8) cb.current(dx < 0 ? 1 : -1)
+    }
+    el.addEventListener('touchstart', down, { passive: true })
+    el.addEventListener('touchend', up, { passive: true })
+    return () => { el.removeEventListener('touchstart', down); el.removeEventListener('touchend', up) }
+  }, [ref, enabled])
+}
+
 function useToday() {
   const [today, setToday] = useState(todayKey())
   useEffect(() => {
@@ -72,6 +107,21 @@ export default function App() {
   const [capturing, setCapturing] = useState(false)
   const [checkingIn, setCheckingIn] = useState(false)
   const [talking, setTalking] = useState(false)
+  const [slide, setSlide] = useState('')
+  const mainRef = useRef(null)
+
+  const goTab = (id) => {
+    const from = TABS.findIndex(t => t.id === tab)
+    const to = TABS.findIndex(t => t.id === id)
+    setSlide(from >= 0 && to >= 0 && to !== from ? (to > from ? 'slide-next' : 'slide-prev') : '')
+    setTab(id)
+  }
+  useSwipe(mainRef, !!planner.data, (dir) => {
+    const i = TABS.findIndex(t => t.id === tab)
+    if (i < 0) return // settings isn't part of the swipe order
+    const next = TABS[i + dir]
+    if (next) goTab(next.id)
+  })
 
   // If you were looking at "today" when the date rolled over, follow it.
   const [prevToday, setPrevToday] = useState(today)
@@ -117,7 +167,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <main className="main">
+      <main ref={mainRef} className={`main ${slide}`}>
         {tab === 'today' && <TodayView ctx={ctx} />}
         {tab === 'plan' && <PlanView ctx={ctx} />}
         {tab === 'goals' && <GoalsView ctx={ctx} />}
@@ -125,20 +175,21 @@ export default function App() {
         {tab === 'settings' && <SettingsView ctx={ctx} />}
       </main>
 
-      {tab !== 'settings' && (
-        <button className="fab" aria-label={tab === 'goals' ? 'Add goal' : 'Capture'} onClick={onFab}>
-          <svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" /></svg>
-        </button>
-      )}
-
-      <nav className="tabbar">
-        {TABS.map(t => (
-          <button key={t.id} className={tab === t.id ? 'on' : ''} onClick={() => setTab(t.id)} aria-current={tab === t.id ? 'page' : undefined}>
-            <svg viewBox="0 0 24 24" width="22" height="22"><path d={t.icon} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" /></svg>
-            <span>{t.label}</span>
+      <div className="dock">
+        <nav className="tabbar" aria-label="Main">
+          {TABS.map(t => (
+            <button key={t.id} className={tab === t.id ? 'on' : ''} onClick={() => goTab(t.id)} aria-current={tab === t.id ? 'page' : undefined}>
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d={t.icon} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" /></svg>
+              <span>{t.label}</span>
+            </button>
+          ))}
+        </nav>
+        {tab !== 'settings' && (
+          <button className="fab" aria-label={tab === 'goals' ? 'Add goal' : 'Capture'} onClick={onFab}>
+            <svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" /></svg>
           </button>
-        ))}
-      </nav>
+        )}
+      </div>
 
       {capturing && (
         <CaptureSheet
