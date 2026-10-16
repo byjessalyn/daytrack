@@ -72,3 +72,13 @@ describe('splitToInbox', () => {
       .toEqual(['Call mom.', 'Buy milk', 'pay rent', 'walk dog', 'email Sam'])
   })
 })
+
+describe('sort prompt rules for ambiguous phrasing', () => {
+  const p = buildSortPrompt('x', { today })
+  it('covers deadlines, vague habits, one-off weekdays and undated goals', () => {
+    expect(p).toContain('"By <day>" is a deadline: do it BEFORE then')
+    expect(p).toContain('Vague habits to build')
+    expect(p).toContain('A day name without "every"/"each"')
+    expect(p).toContain('pace the steps about a week apart')
+  })
+})
