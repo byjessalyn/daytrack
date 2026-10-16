@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { LISTS, REMINDERS, REPEATS } from '../lib/tasks.js'
+import { LISTS, REMINDERS, REPEATS, newId } from '../lib/tasks.js'
+import { todayKey } from '../lib/dates.js'
 import { DEFAULT_HABIT_TARGET } from '../lib/goals.js'
 
 const SCOPES = [
-  { id: 'day', label: 'Day task' },
-  { id: 'week', label: 'Week task' },
-  { id: 'month', label: 'Month task' },
+  { id: 'inbox', label: 'Inbox' },
+  { id: 'day', label: 'Day' },
+  { id: 'week', label: 'Week' },
+  { id: 'month', label: 'Month' },
 ]
 
 export default function TaskEditor({ initial, goals = [], onSave, onDelete, onClose, notificationsOn }) {
@@ -13,6 +15,15 @@ export default function TaskEditor({ initial, goals = [], onSave, onDelete, onCl
   const titleRef = useRef(null)
   const isNew = !initial.id
   const set = (patch) => setT(prev => ({ ...prev, ...patch }))
+  const [newItem, setNewItem] = useState('')
+  const checklist = t.checklist || []
+
+  function addItem() {
+    const text = newItem.trim()
+    if (!text) return
+    set({ checklist: [...checklist, { id: newId(), text }] })
+    setNewItem('')
+  }
 
   useEffect(() => {
     if (isNew) titleRef.current?.focus()
@@ -24,7 +35,7 @@ export default function TaskEditor({ initial, goals = [], onSave, onDelete, onCl
   function submit(e) {
     e.preventDefault()
     if (!t.title.trim()) return
-    onSave({ ...t, title: t.title.trim(), notes: t.notes.trim() })
+    onSave({ ...t, title: t.title.trim(), notes: t.notes.trim(), link: normaliseLink(t.link) })
   }
 
   return (
@@ -50,12 +61,14 @@ export default function TaskEditor({ initial, goals = [], onSave, onDelete, onCl
           {SCOPES.map(s => (
             <button
               type="button" key={s.id} role="tab" aria-selected={t.scope === s.id}
-              className={t.scope === s.id ? 'on' : ''} onClick={() => set({ scope: s.id })}
+              className={t.scope === s.id ? 'on' : ''} onClick={() => set({ scope: s.id, date: t.date || todayKey() })}
             >{s.label}</button>
           ))}
         </div>
 
-        <div className="field-grid">
+        {t.scope === 'inbox' && <p className="hint">Inbox items have no date. Pick Day, Week or Month when you're ready to plan it.</p>}
+
+        {t.scope !== 'inbox' && <div className="field-grid">
           <label className="field">
             <span>{t.scope === 'day' ? 'Date' : t.scope === 'week' ? 'Any day in the week' : 'Any day in the month'}</span>
             <input type="date" value={t.date} onChange={e => e.target.value && set({ date: e.target.value })} required />
@@ -84,7 +97,7 @@ export default function TaskEditor({ initial, goals = [], onSave, onDelete, onCl
               </label>
             </>
           )}
-        </div>
+        </div>}
         {t.scope === 'day' && !t.time && <p className="hint">Add a time to set a reminder.</p>}
         {t.scope === 'day' && t.time && t.remind != null && !notificationsOn && (
           <p className="hint">Turn on notifications in Settings to get this reminder.</p>
@@ -116,6 +129,37 @@ export default function TaskEditor({ initial, goals = [], onSave, onDelete, onCl
         )}
 
         <div className="field">
+          <span>Checklist</span>
+          {checklist.length > 0 && (
+            <ul className="cl-edit">
+              {checklist.map((it, i) => (
+                <li key={it.id}>
+                  <input
+                    id={`cl-${it.id}`} value={it.text} aria-label={`Checklist item ${i + 1}`}
+                    onChange={e => set({ checklist: checklist.map(c => (c.id === it.id ? { ...c, text: e.target.value } : c)) })}
+                  />
+                  <button type="button" className="icon-btn small-icon" aria-label={`Remove "${it.text}"`}
+                    onClick={() => set({ checklist: checklist.filter(c => c.id !== it.id) })}>×</button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="cl-add">
+            <input
+              id="cl-new" placeholder="Add an item" value={newItem}
+              onChange={e => setNewItem(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addItem() } }}
+            />
+            <button type="button" className="pill" onClick={addItem} disabled={!newItem.trim()}>Add</button>
+          </div>
+        </div>
+
+        <label className="field">
+          <span>Link</span>
+          <input id="task-link" type="text" inputMode="url" autoCapitalize="none" autoCorrect="off" placeholder="https://" value={t.link || ''} onChange={e => set({ link: e.target.value })} />
+        </label>
+
+        <div className="field">
           <span>List</span>
           <div className="chips">
             {LISTS.map(l => (
@@ -135,4 +179,10 @@ export default function TaskEditor({ initial, goals = [], onSave, onDelete, onCl
       </form>
     </div>
   )
+}
+
+function normaliseLink(raw) {
+  const v = (raw || '').trim()
+  if (!v) return ''
+  return /^https?:\/\//i.test(v) ? v : `https://${v}`
 }

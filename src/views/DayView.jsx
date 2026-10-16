@@ -3,7 +3,7 @@ import { itemsForDay, monthProgress, overdueItems, progress, weekProgress } from
 import { Bar, Empty, Nav, Ring, TaskRow } from '../components/ui.jsx'
 
 export default function DayView({ ctx }) {
-  const { tasks, settings, goalMap, date, setDate, today, toggle, openEditor, moveTask } = ctx
+  const { tasks, settings, goalMap, date, setDate, today, toggle, toggleChecklistItem, openEditor, moveTask } = ctx
   const items = itemsForDay(tasks, date)
   const p = progress(items)
   const isToday = date === today
@@ -36,7 +36,7 @@ export default function DayView({ ctx }) {
             {overdue.map(it => (
               <TaskRow
                 key={it.task.id} item={it} goal={goalMap[it.task.goalId]}
-                onToggle={() => toggle(it.task.id, it.key)}
+                onToggle={() => toggle(it.task.id, it.key)} onCheck={(cid) => toggleChecklistItem(it.task.id, it.key, cid)}
                 onOpen={() => openEditor(it.task)}
                 extra={<button className="pill" onClick={() => moveTask(it.task.id, today)}>Move to today</button>}
               />
@@ -50,7 +50,7 @@ export default function DayView({ ctx }) {
         {items.length ? (
           <div className="card list">
             {items.map(it => (
-              <TaskRow key={it.task.id} item={it} goal={goalMap[it.task.goalId]} onToggle={() => toggle(it.task.id, it.key)} onOpen={() => openEditor(it.task)} />
+              <TaskRow key={it.task.id} item={it} goal={goalMap[it.task.goalId]} onToggle={() => toggle(it.task.id, it.key)} onCheck={(cid) => toggleChecklistItem(it.task.id, it.key, cid)} onOpen={() => openEditor(it.task)} />
             ))}
           </div>
         ) : (

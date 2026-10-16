@@ -9,6 +9,7 @@ if (js.length !== 1) throw new Error(`expected 1 JS bundle, got ${js.length}`)
 
 const page = `<title>Daytrack</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>${css}
 /* The artifact frame already pads the top safe area. */
 :root { --safe-top: 0px; }

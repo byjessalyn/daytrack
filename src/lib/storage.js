@@ -15,7 +15,7 @@ export const DEFAULT_SETTINGS = {
   eveningTime: '20:00',
 }
 
-export const EMPTY_DATA = { tasks: [], goals: [], settings: DEFAULT_SETTINGS }
+export const EMPTY_DATA = { tasks: [], goals: [], checkins: {}, settings: DEFAULT_SETTINGS }
 
 function parse(raw) {
   if (!raw) return EMPTY_DATA
@@ -24,6 +24,7 @@ function parse(raw) {
     return {
       tasks: Array.isArray(data.tasks) ? data.tasks : [],
       goals: Array.isArray(data.goals) ? data.goals : [],
+      checkins: data.checkins && typeof data.checkins === 'object' ? data.checkins : {},
       settings: { ...DEFAULT_SETTINGS, ...(data.settings || {}) },
     }
   } catch {

@@ -62,7 +62,11 @@ export default function SettingsView({ ctx }) {
 
   return (
     <div className="view">
-      <div className="nav"><div className="nav-title"><h1>Settings</h1></div></div>
+      <div className="nav">
+        <button className="icon-btn" onClick={ctx.closeSettings} aria-label="Back">‹</button>
+        <div className="nav-title"><h1>Settings</h1></div>
+        <span className="icon-btn" aria-hidden="true" />
+      </div>
 
       <h2 className="section-title">Notifications</h2>
       <div className="card list">

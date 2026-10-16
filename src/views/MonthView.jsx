@@ -3,7 +3,7 @@ import { dayProgress, goalsForMonth, monthProgress } from '../lib/tasks.js'
 import { Bar, Empty, Nav, TaskRow } from '../components/ui.jsx'
 
 export default function MonthView({ ctx }) {
-  const { tasks, settings, goalMap, date, setDate, today, toggle, openEditor, goToDay, newTask } = ctx
+  const { tasks, settings, goalMap, date, setDate, today, toggle, toggleChecklistItem, openEditor, goToDay, newTask } = ctx
   const month = startOfMonth(date)
   const days = monthDays(month)
   const goals = goalsForMonth(tasks, month)
@@ -61,7 +61,7 @@ export default function MonthView({ ctx }) {
         </div>
         {goals.length ? (
           <div className="card list">
-            {goals.map(it => <TaskRow key={it.task.id} item={it} goal={goalMap[it.task.goalId]} onToggle={() => toggle(it.task.id, it.key)} onOpen={() => openEditor(it.task)} />)}
+            {goals.map(it => <TaskRow key={it.task.id} item={it} goal={goalMap[it.task.goalId]} onToggle={() => toggle(it.task.id, it.key)} onCheck={(cid) => toggleChecklistItem(it.task.id, it.key, cid)} onOpen={() => openEditor(it.task)} />)}
           </div>
         ) : <Empty>Things to get done sometime this month, on no particular day.</Empty>}
       </section>

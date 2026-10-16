@@ -8,7 +8,7 @@ import {
    id: string,
    title: string,
    notes: string,
-   scope: 'day' | 'week' | 'month',
+   scope: 'day' | 'week' | 'month' | 'inbox',   // inbox: captured, not scheduled yet (date null)
    date: 'YYYY-MM-DD',      // day: the day (or first day of a repeat)
                             // week: first day of the week, month: first day of the month
    time: 'HH:MM' | '',      // day scope only
@@ -18,16 +18,20 @@ import {
    goalId: string | null,   // goal this task counts toward
    target: number | null,   // repeating tasks: completions needed for the goal
    done: { [occurrenceKey]: true },  // occurrence key = the day (day) or `date` (week/month)
+   link: string,            // optional URL
+   checklist: [{ id, text }],
+   checks: { [occurrenceKey]: [itemId] },  // ticked checklist items, per occurrence so repeats reset
    createdAt: number,
  }
 */
 
+// Colours come from the byjessalyn palette (rose, blue, gold, brown scales).
 export const LISTS = [
-  { id: 'personal', label: 'Personal', color: '#E07A5F' },
-  { id: 'work',     label: 'Work',     color: '#3D7DD8' },
-  { id: 'health',   label: 'Health',   color: '#2A9D6F' },
-  { id: 'home',     label: 'Home',     color: '#B07CC6' },
-  { id: 'errands',  label: 'Errands',  color: '#D4A017' },
+  { id: 'personal', label: 'Personal', color: '#cb7190' },
+  { id: 'work',     label: 'Work',     color: '#3d6eb3' },
+  { id: 'health',   label: 'Health',   color: '#9ab4d7' },
+  { id: 'home',     label: 'Home',     color: '#cd9b4e' },
+  { id: 'errands',  label: 'Errands',  color: '#916f5f' },
 ]
 
 export const REPEATS = [
@@ -68,6 +72,9 @@ export function makeTask(fields) {
     repeat: 'none',
     list: 'personal',
     goalId: null,           // links the task to a goal (see goals.js)
+    link: '',
+    checklist: [],
+    checks: {},
     target: null,           // habits: how many completions count toward the goal
     done: {},
     createdAt: Date.now(),
@@ -169,4 +176,37 @@ export function normaliseDate(scope, key, weekStartsOn) {
   if (scope === 'week') return startOfWeek(key, weekStartsOn)
   if (scope === 'month') return startOfMonth(key)
   return key
+}
+
+// ── Checklists ─────────────────────────────────────────
+export function checklistProgress(task, key) {
+  const items = task.checklist || []
+  if (!items.length) return null
+  const ticked = new Set(task.checks?.[key] || [])
+  const done = items.filter(i => ticked.has(i.id)).length
+  return { done, total: items.length }
+}
+
+export function isChecked(task, key, itemId) {
+  return (task.checks?.[key] || []).includes(itemId)
+}
+
+// Ticking the last item also completes the task; unticking one reopens it.
+export function toggleCheck(task, key, itemId) {
+  const current = new Set(task.checks?.[key] || [])
+  if (current.has(itemId)) current.delete(itemId)
+  else current.add(itemId)
+  const ids = (task.checklist || []).map(i => i.id).filter(id => current.has(id))
+  const checks = { ...task.checks, [key]: ids }
+  const allDone = ids.length === (task.checklist || []).length
+  const done = { ...task.done }
+  if (allDone) done[key] = true
+  else delete done[key]
+  return { ...task, checks, done }
+}
+
+export function inboxItems(tasks) {
+  return tasks
+    .filter(t => t.scope === 'inbox')
+    .sort((a, b) => a.createdAt - b.createdAt)
 }

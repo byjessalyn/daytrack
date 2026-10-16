@@ -3,7 +3,7 @@ import { goalsForWeek, itemsForDay, listColor, progress, weekProgress } from '..
 import { Bar, Empty, Nav, TaskRow } from '../components/ui.jsx'
 
 export default function WeekView({ ctx }) {
-  const { tasks, settings, goalMap, date, setDate, today, toggle, openEditor, goToDay, newTask } = ctx
+  const { tasks, settings, goalMap, date, setDate, today, toggle, toggleChecklistItem, openEditor, goToDay, newTask } = ctx
   const start = startOfWeek(date, settings.weekStartsOn)
   const goals = goalsForWeek(tasks, start)
   const isCurrent = start === startOfWeek(today, settings.weekStartsOn)
@@ -30,7 +30,7 @@ export default function WeekView({ ctx }) {
         </div>
         {goals.length ? (
           <div className="card list">
-            {goals.map(it => <TaskRow key={it.task.id} item={it} goal={goalMap[it.task.goalId]} onToggle={() => toggle(it.task.id, it.key)} onOpen={() => openEditor(it.task)} />)}
+            {goals.map(it => <TaskRow key={it.task.id} item={it} goal={goalMap[it.task.goalId]} onToggle={() => toggle(it.task.id, it.key)} onCheck={(cid) => toggleChecklistItem(it.task.id, it.key, cid)} onOpen={() => openEditor(it.task)} />)}
           </div>
         ) : <Empty>Things to get done sometime this week, on no particular day.</Empty>}
       </section>

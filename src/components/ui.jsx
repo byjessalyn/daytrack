@@ -1,4 +1,5 @@
-import { listColor } from '../lib/tasks.js'
+import { useState } from 'react'
+import { checklistProgress, isChecked, listColor } from '../lib/tasks.js'
 import { formatTime } from '../lib/dates.js'
 
 export function Ring({ pct, size = 88, stroke = 9, label, sub }) {
@@ -34,9 +35,12 @@ export function Bar({ label, p }) {
   )
 }
 
-export function TaskRow({ item, onToggle, onOpen, extra, goal }) {
-  const { task, done } = item
+export function TaskRow({ item, onToggle, onOpen, onCheck, extra, goal }) {
+  const { task, done, key } = item
+  const [open, setOpen] = useState(false)
+  const cl = checklistProgress(task, key)
   return (
+    <div className="task-wrap">
     <div className={`task ${done ? 'is-done' : ''}`}>
       <button
         className="check"
@@ -53,11 +57,35 @@ export function TaskRow({ item, onToggle, onOpen, extra, goal }) {
           {task.time && <span>{formatTime(task.time)}</span>}
           {task.repeat !== 'none' && task.scope === 'day' && <span title="Repeats">↻</span>}
           {task.remind != null && task.time && <span title="Reminder set">🔔</span>}
+          {cl && <span className="cl-count">☑ {cl.done}/{cl.total}</span>}
           {goal && <span className="goal-tag ellipsis" style={{ '--c': listColor(goal.list) }}>◎ {goal.title}</span>}
           {task.notes && <span className="ellipsis">{task.notes}</span>}
         </span>
       </button>
+      {task.link && (
+        <a className="icon-btn small-icon" href={task.link} target="_blank" rel="noreferrer" aria-label={`Open link for "${task.title}"`}>↗</a>
+      )}
+      {cl && onCheck && (
+        <button className="icon-btn small-icon" onClick={() => setOpen(o => !o)} aria-expanded={open} aria-label={open ? 'Hide checklist' : 'Show checklist'}>
+          {open ? '▴' : '▾'}
+        </button>
+      )}
       {extra}
+    </div>
+    {open && cl && onCheck && (
+      <ul className="checklist">
+        {task.checklist.map(it => {
+          const on = isChecked(task, key, it.id)
+          return (
+            <li key={it.id}>
+              <button className={`mini-check ${on ? 'on' : ''}`} onClick={() => onCheck(it.id)} aria-pressed={on}>
+                <i>{on && '✓'}</i><span>{it.text}</span>
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    )}
     </div>
   )
 }
