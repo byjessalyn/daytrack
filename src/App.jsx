@@ -1,229 +1,101 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { useStore } from './hooks/useStore.js'
-import { useTimer } from './hooks/useTimer.js'
-import gameData from './data/gameData.json'
+import { useCallback, useEffect, useState } from 'react'
+import { usePlanner } from './usePlanner.js'
+import { todayKey } from './lib/dates.js'
+import { onNotificationTap } from './lib/native.js'
+import TaskEditor from './components/TaskEditor.jsx'
+import DayView from './views/DayView.jsx'
+import WeekView from './views/WeekView.jsx'
+import MonthView from './views/MonthView.jsx'
+import SettingsView from './views/SettingsView.jsx'
 
-import HomeScreen     from './screens/HomeScreen.jsx'
-import QuestsScreen   from './screens/QuestsScreen.jsx'
-import MapScreen      from './screens/MapScreen.jsx'
-import BadgesScreen   from './screens/BadgesScreen.jsx'
-import RoadmapScreen  from './screens/RoadmapScreen.jsx'
-import AnalyticsScreen from './screens/AnalyticsScreen.jsx'
-import FocusScreen    from './screens/FocusScreen.jsx'
-import JournalScreen  from './screens/JournalScreen.jsx'
-
-import LevelUpOverlay  from './components/LevelUpOverlay.jsx'
-import RecoveryOverlay from './components/RecoveryOverlay.jsx'
-import ChallengeOverlay from './components/ChallengeOverlay.jsx'
-import ThemeModal      from './components/ThemeModal.jsx'
-import DevPanel        from './components/DevPanel.jsx'
-import CPFloat         from './components/CPFloat.jsx'
-import Confetti        from './components/Confetti.jsx'
-import TimerOverlay    from './components/TimerOverlay.jsx'
-
-const SCREENS = [
-  { id: 'home',      icon: '🏠', label: 'home'    },
-  { id: 'quests',    icon: '✨', label: 'quests'  },
-  { id: 'map',       icon: '🗺️', label: 'map'     },
-  { id: 'badges',    icon: '🏅', label: 'badges'  },
-  { id: 'roadmap',   icon: '📍', label: 'roadmap' },
-  { id: 'analytics', icon: '📊', label: 'stats'   },
-  { id: 'focus',     icon: '⏱️', label: 'focus'   },
-  { id: 'journal',   icon: '📓', label: 'journal' },
+const TABS = [
+  { id: 'day', label: 'Day', icon: 'M4 6h16M4 12h16M4 18h10' },
+  { id: 'week', label: 'Week', icon: 'M4 5h16v15H4zM4 10h16M9 5v15M14 5v15' },
+  { id: 'month', label: 'Month', icon: 'M4 5h16v15H4zM4 10h16M8 3v4M16 3v4' },
+  { id: 'settings', label: 'Settings', icon: 'M4 7h9M17 7h3M4 17h3M11 17h9M15 5v4M9 15v4' },
 ]
 
-export default function App() {
-  const store = useStore()
-  const timer = useTimer()
-
-  const [screen, setScreen]         = useState('home')
-  const [showLevelUp, setShowLevelUp] = useState(false)
-  const [levelUpData, setLevelUpData] = useState(null)
-  const [showRecovery, setShowRecovery] = useState(false)
-  const [showChallenge, setShowChallenge] = useState(false)
-  const [showTheme, setShowTheme]   = useState(false)
-  const [showDev, setShowDev]       = useState(false)
-  const [cpFloats, setCpFloats]     = useState([])
-  const [showConfetti, setShowConfetti] = useState(false)
-  const prevXpRef = useRef(store.state.xp)
-  const prevLevelRef = useRef(store.level.level)
-
-  // Apply theme to document
+function useToday() {
+  const [today, setToday] = useState(todayKey())
   useEffect(() => {
-    const t = store.state.activeTheme
-    document.documentElement.dataset.theme = t === 'default' ? '' : t
-  }, [store.state.activeTheme])
-
-  // Watch for level-up
-  useEffect(() => {
-    const newLevel = store.level.level
-    if (newLevel > prevLevelRef.current) {
-      const def = gameData.levels.find(l => l.level === newLevel)
-      const msg = gameData.levelMessages[String(newLevel)] || 'you leveled up! mochi is so proud. 🌸'
-      const reward = gameData.realWorldRewards[String(newLevel)]
-      setLevelUpData({ ...def, msg, reward })
-      setShowLevelUp(true)
-      setShowConfetti(true)
-      playChime()
-    }
-    prevLevelRef.current = newLevel
-  }, [store.level.level])
-
-  // Watch for streak-based recovery (shown after streak reset on new session)
-  useEffect(() => {
-    const { streak, lastDate, recoveryDone } = store.state
-    if (streak === 0 && lastDate && !recoveryDone) {
-      // small delay so app renders first
-      const t = setTimeout(() => setShowRecovery(true), 1500)
-      return () => clearTimeout(t)
-    }
-  }, []) // only on mount
-
-  // XP float helper exposed to children
-  const spawnFloat = useCallback((text) => {
-    const id = Date.now() + Math.random()
-    setCpFloats(prev => [...prev, { id, text }])
-    setTimeout(() => setCpFloats(prev => prev.filter(f => f.id !== id)), 1800)
+    // Roll over at midnight and when the app is reopened on a new day.
+    const tick = () => setToday(todayKey())
+    const id = setInterval(tick, 60000)
+    document.addEventListener('visibilitychange', tick)
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', tick) }
   }, [])
+  return today
+}
 
-  // Wrapped addXP that also shows float
-  const addXPWithFloat = useCallback((amt, label) => {
-    store.addXP(amt)
-    spawnFloat(label || `+${amt} XP ✨`)
-  }, [store, spawnFloat])
+export default function App() {
+  const planner = usePlanner()
+  const today = useToday()
+  const [tab, setTab] = useState('day')
+  const [date, setDate] = useState(today)
+  const [editing, setEditing] = useState(null)
 
-  function playChime() {
-    try {
-      const ac = new (window.AudioContext || window.webkitAudioContext)()
-      ;[523, 659, 784, 1047].forEach((f, i) => {
-        const o = ac.createOscillator(), g = ac.createGain()
-        o.connect(g); g.connect(ac.destination)
-        o.frequency.value = f; o.type = 'sine'
-        const t = ac.currentTime + i * 0.15
-        g.gain.setValueAtTime(0, t)
-        g.gain.linearRampToValueAtTime(0.12, t + 0.05)
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.45)
-        o.start(t); o.stop(t + 0.5)
-      })
-    } catch (e) {}
+  // If you were looking at "today" when the date rolled over, follow it.
+  const [prevToday, setPrevToday] = useState(today)
+  if (today !== prevToday) {
+    setPrevToday(today)
+    if (date === prevToday) setDate(today)
   }
+
+  useEffect(() => onNotificationTap(({ date: d }) => {
+    if (d) { setDate(d); setTab('day') }
+  }), [])
+
+  const goToDay = useCallback((k) => { setDate(k); setTab('day') }, [])
+
+  if (!planner.data) return <div className="boot" />
+  const { data } = planner
+
+  const newTask = (fields = {}) => setEditing({
+    title: '', notes: '', scope: 'day',
+    date, time: '', remind: null, repeat: 'none', list: 'personal', ...fields,
+  })
 
   const ctx = {
-    store,
-    timer,
-    screen,
-    setScreen,
-    addXP: addXPWithFloat,
-    spawnFloat,
-    openChallenge: () => setShowChallenge(true),
-    openTheme:     () => setShowTheme(true),
-    openDev:       () => setShowDev(prev => !prev),
+    ...planner,
+    tasks: data.tasks,
+    settings: data.settings,
+    today, date, setDate, goToDay, newTask,
+    openEditor: (task) => setEditing({ ...task }),
   }
 
-  const screenProps = { ctx }
-
   return (
-    <div className="app-shell">
-      {/* Settings button */}
-      {!timer.timerState.active && (
-        <button className="settings-btn" onClick={() => setShowTheme(true)}>🎨</button>
+    <div className="app">
+      <main className="main">
+        {tab === 'day' && <DayView ctx={ctx} />}
+        {tab === 'week' && <WeekView ctx={ctx} />}
+        {tab === 'month' && <MonthView ctx={ctx} />}
+        {tab === 'settings' && <SettingsView ctx={ctx} />}
+      </main>
+
+      {tab !== 'settings' && (
+        <button className="fab" aria-label="Add task" onClick={() => newTask()}>
+          <svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" /></svg>
+        </button>
       )}
 
-      {/* Focus Add button — shown only on focus screen */}
-      {screen === 'focus' && !timer.timerState.active && (
-        <button
-          className="focus-add-btn"
-          style={{ position: 'fixed', top: 14, right: 16, zIndex: 202 }}
-          onClick={() => ctx.store._openFbForm?.()}
+      <nav className="tabbar">
+        {TABS.map(t => (
+          <button key={t.id} className={tab === t.id ? 'on' : ''} onClick={() => setTab(t.id)} aria-current={tab === t.id ? 'page' : undefined}>
+            <svg viewBox="0 0 24 24" width="22" height="22"><path d={t.icon} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" /></svg>
+            <span>{t.label}</span>
+          </button>
+        ))}
+      </nav>
+
+      {editing && (
+        <TaskEditor
+          initial={editing}
+          notificationsOn={data.settings.notifications}
+          onClose={() => setEditing(null)}
+          onSave={(t) => { planner.saveTask(t); setEditing(null) }}
+          onDelete={(id) => { planner.deleteTask(id); setEditing(null) }}
         />
       )}
-
-      {/* Screen content */}
-      <div className="screen-content">
-        {screen === 'home'      && <HomeScreen      {...screenProps} />}
-        {screen === 'quests'    && <QuestsScreen    {...screenProps} />}
-        {screen === 'map'       && <MapScreen        {...screenProps} />}
-        {screen === 'badges'    && <BadgesScreen    {...screenProps} />}
-        {screen === 'roadmap'   && <RoadmapScreen   {...screenProps} />}
-        {screen === 'analytics' && <AnalyticsScreen {...screenProps} />}
-        {screen === 'focus'     && <FocusScreen     {...screenProps} />}
-        {screen === 'journal'   && <JournalScreen   {...screenProps} />}
-      </div>
-
-      {/* Bottom Nav */}
-      {!timer.timerState.active && (
-        <nav className="bottom-nav">
-          {SCREENS.map(s => (
-            <div
-              key={s.id}
-              className={`nav-item ${screen === s.id ? 'active' : ''}`}
-              onClick={() => setScreen(s.id)}
-            >
-              <span className="nav-icon">{s.icon}</span>
-              <span className="nav-label">{s.label}</span>
-            </div>
-          ))}
-        </nav>
-      )}
-
-      {/* Timer overlay */}
-      {timer.timerState.active && (
-        <TimerOverlay timer={timer} onXP={() => addXPWithFloat(50, '+50 XP 🌸 focus complete!')} />
-      )}
-
-      {/* Floating overlays */}
-      {showLevelUp && levelUpData && (
-        <LevelUpOverlay
-          data={levelUpData}
-          onClose={() => { setShowLevelUp(false); setShowConfetti(false) }}
-        />
-      )}
-      {showRecovery && (
-        <RecoveryOverlay
-          store={store}
-          onComplete={() => {
-            addXPWithFloat(35, '+35 XP 🌸 recovery quest!')
-            store.setRecoveryDone()
-            store.incrementRecovery()
-            const count = store.recoveryCount + 1
-            if (count >= 3) store.awardBadge('recovery_queen')
-            setShowRecovery(false)
-          }}
-          onClose={() => setShowRecovery(false)}
-        />
-      )}
-      {showChallenge && (
-        <ChallengeOverlay
-          onComplete={() => {
-            if (!store.state.challengeDoneToday) {
-              addXPWithFloat(25, '+25 XP ✨ challenge done!')
-              store.setChallengeDone()
-            }
-            store.incrementBlocker()
-            setShowChallenge(false)
-          }}
-          onClose={() => setShowChallenge(false)}
-        />
-      )}
-      {showTheme && (
-        <ThemeModal
-          store={store}
-          onClose={() => setShowTheme(false)}
-        />
-      )}
-      {showDev && (
-        <DevPanel
-          store={store}
-          addXP={addXPWithFloat}
-          onClose={() => setShowDev(false)}
-        />
-      )}
-
-      {/* CP Floats */}
-      {cpFloats.map(f => <CPFloat key={f.id} text={f.text} />)}
-
-      {/* Confetti */}
-      {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
     </div>
   )
 }

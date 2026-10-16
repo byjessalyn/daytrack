@@ -3,5 +3,6 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/',
+  // Relative asset paths so the same build works on Vercel and inside the iOS app.
+  base: './',
 })

@@ -1,0 +1,10 @@
+{
+  "appId": "com.byjessalyn.daytrack",
+  "appName": "Daytrack",
+  "webDir": "dist",
+  "plugins": {
+    "LocalNotifications": {
+      "iconColor": "#E07A5F"
+    }
+  }
+}
