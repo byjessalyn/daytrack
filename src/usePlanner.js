@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { App as CapApp } from '@capacitor/app'
 import { EMPTY_DATA, loadData, saveData } from './lib/storage.js'
 import { syncNotifications, syncWidget, isNative } from './lib/native.js'
-import { makeTask, normaliseDate, toggleCheck, toggleDone } from './lib/tasks.js'
+import { makeTask, newId, normaliseDate, toggleCheck, toggleDone } from './lib/tasks.js'
 import { makeGoal } from './lib/goals.js'
 
 export function usePlanner() {
@@ -65,8 +65,9 @@ export function usePlanner() {
   })), [update])
 
   // Quick capture: a title only, sorted later.
-  const capture = useCallback((title) => update(d => ({
-    ...d, tasks: [...d.tasks, makeTask({ title, scope: 'inbox', date: null })],
+  const capture = useCallback((titles) => update(d => ({
+    ...d,
+    tasks: [...d.tasks, ...[].concat(titles).map(title => makeTask({ title, scope: 'inbox', date: null }))],
   })), [update])
 
   // Give an inbox item a day (or move any task to another day).
@@ -77,6 +78,27 @@ export function usePlanner() {
   const toggleChecklistItem = useCallback((id, key, itemId) => update(d => ({
     ...d, tasks: d.tasks.map(t => (t.id === id ? toggleCheck(t, key, itemId) : t)),
   })), [update])
+
+  // Add the approved results of "Talk it out" in one update.
+  const addProposals = useCallback((proposals) => update(d => {
+    const ws = d.settings.weekStartsOn
+    const tasks = [...d.tasks]
+    const goals = [...d.goals]
+    for (const p of proposals) {
+      if (p.kind === 'goal') {
+        const goal = makeGoal({ title: p.title, list: p.list, deadline: p.deadline })
+        goals.push(goal)
+        for (const st of p.steps) tasks.push(makeTask({ title: st.title, date: st.date, list: p.list, goalId: goal.id }))
+      } else {
+        tasks.push(makeTask({
+          title: p.title, scope: p.scope, date: normaliseDate(p.scope, p.date, ws), time: p.time,
+          repeat: p.repeat, list: p.list, goalId: p.goalId,
+          checklist: p.checklist.map(text => ({ id: newId(), text })),
+        }))
+      }
+    }
+    return { ...d, tasks, goals }
+  }), [update])
 
   const saveCheckin = useCallback((key, entry) => update(d => ({
     ...d, checkins: { ...d.checkins, [key]: { ...entry, at: Date.now() } },
@@ -103,6 +125,6 @@ export function usePlanner() {
 
   return {
     data, saveTask, deleteTask, toggle, moveTask, capture, scheduleTask, toggleChecklistItem,
-    saveCheckin, saveGoal, deleteGoal, setSettings, replaceAll,
+    addProposals, saveCheckin, saveGoal, deleteGoal, setSettings, replaceAll,
   }
 }

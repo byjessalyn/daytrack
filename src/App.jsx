@@ -6,6 +6,7 @@ import TaskEditor from './components/TaskEditor.jsx'
 import GoalEditor from './components/GoalEditor.jsx'
 import CaptureSheet from './components/CaptureSheet.jsx'
 import CheckinSheet from './components/CheckinSheet.jsx'
+import TalkSheet from './components/TalkSheet.jsx'
 import TodayView from './views/TodayView.jsx'
 import PlanView from './views/PlanView.jsx'
 import GoalsView from './views/GoalsView.jsx'
@@ -18,6 +19,34 @@ const TABS = [
   { id: 'goals', label: 'Goals', icon: 'M12 21a9 9 0 100-18 9 9 0 000 18zM12 16a4 4 0 100-8 4 4 0 000 8zM12 12h.01' },
   { id: 'life', label: 'Life', icon: 'M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z' },
 ]
+
+// iOS doesn't shrink the page when the keyboard opens, so bottom sheets end up
+// behind it. Track the visible area and size sheets to fit inside it.
+function useVisualViewport() {
+  useEffect(() => {
+    const vv = window.visualViewport
+    if (!vv) return
+    const root = document.documentElement
+    const sync = () => {
+      root.style.setProperty('--vvh', `${vv.height}px`)
+      root.style.setProperty('--vvtop', `${vv.offsetTop}px`)
+    }
+    sync()
+    vv.addEventListener('resize', sync)
+    vv.addEventListener('scroll', sync)
+    // Keep the field being typed in visible once the keyboard has opened.
+    const onFocus = (e) => {
+      if (!e.target.closest?.('.sheet')) return
+      setTimeout(() => e.target.scrollIntoView?.({ block: 'center', behavior: 'smooth' }), 300)
+    }
+    document.addEventListener('focusin', onFocus)
+    return () => {
+      vv.removeEventListener('resize', sync)
+      vv.removeEventListener('scroll', sync)
+      document.removeEventListener('focusin', onFocus)
+    }
+  }, [])
+}
 
 function useToday() {
   const [today, setToday] = useState(todayKey())
@@ -34,6 +63,7 @@ function useToday() {
 export default function App() {
   const planner = usePlanner()
   const today = useToday()
+  useVisualViewport()
   const [tab, setTab] = useState('today')
   const [planMode, setPlanMode] = useState('day')
   const [date, setDate] = useState(today)
@@ -41,6 +71,7 @@ export default function App() {
   const [editingGoal, setEditingGoal] = useState(null)
   const [capturing, setCapturing] = useState(false)
   const [checkingIn, setCheckingIn] = useState(false)
+  const [talking, setTalking] = useState(false)
 
   // If you were looking at "today" when the date rolled over, follow it.
   const [prevToday, setPrevToday] = useState(today)
@@ -114,7 +145,17 @@ export default function App() {
           onCapture={planner.capture}
           onDetails={(title) => { setCapturing(false); newTask({ title }) }}
           onNewGoal={() => { setCapturing(false); newGoal() }}
+          onTalk={() => { setCapturing(false); setTalking(true) }}
           onClose={() => setCapturing(false)}
+        />
+      )}
+
+      {talking && (
+        <TalkSheet
+          today={today} settings={data.settings} goals={data.goals}
+          onClose={() => setTalking(false)}
+          onInbox={(lines) => { planner.capture(lines); setTalking(false); setTab('today') }}
+          onAdd={(items) => { planner.addProposals(items); setTalking(false); setTab('today') }}
         />
       )}
 

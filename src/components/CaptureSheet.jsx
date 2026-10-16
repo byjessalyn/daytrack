@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 // One-tap capture: type it, save it to the inbox, sort it later.
-export default function CaptureSheet({ onCapture, onDetails, onNewGoal, onClose }) {
+export default function CaptureSheet({ onCapture, onDetails, onNewGoal, onTalk, onClose }) {
   const [text, setText] = useState('')
   const [saved, setSaved] = useState(0)
   const inputRef = useRef(null)
@@ -32,6 +32,10 @@ export default function CaptureSheet({ onCapture, onDetails, onNewGoal, onClose 
           <strong>Capture</strong>
           <span className="link-btn placeholder" aria-hidden="true">Done</span>
         </div>
+        <button type="button" className="talk-cta" onClick={onTalk}>
+          <span aria-hidden="true">🎤</span>
+          <span><strong>Talk it out</strong><span className="muted small block">Say everything at once. Claude sorts it into day, week and month tasks and goals.</span></span>
+        </button>
         <div className="capture-row">
           <input
             ref={inputRef} id="capture-input" className="title-input" placeholder="What's on your mind?"
