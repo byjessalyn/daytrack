@@ -15,6 +15,8 @@ import {
    remind: number | null,   // minutes before `time`; needs a time
    repeat: 'none' | 'daily' | 'weekdays' | 'weekly' | 'monthly',  // day scope only
    list: string,            // id from LISTS
+   goalId: string | null,   // goal this task counts toward
+   target: number | null,   // repeating tasks: completions needed for the goal
    done: { [occurrenceKey]: true },  // occurrence key = the day (day) or `date` (week/month)
    createdAt: number,
  }
@@ -65,6 +67,8 @@ export function makeTask(fields) {
     remind: null,
     repeat: 'none',
     list: 'personal',
+    goalId: null,           // links the task to a goal (see goals.js)
+    target: null,           // habits: how many completions count toward the goal
     done: {},
     createdAt: Date.now(),
     ...fields,

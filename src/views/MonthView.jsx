@@ -3,7 +3,7 @@ import { dayProgress, goalsForMonth, monthProgress } from '../lib/tasks.js'
 import { Bar, Empty, Nav, TaskRow } from '../components/ui.jsx'
 
 export default function MonthView({ ctx }) {
-  const { tasks, settings, date, setDate, today, toggle, openEditor, goToDay, newTask } = ctx
+  const { tasks, settings, goalMap, date, setDate, today, toggle, openEditor, goToDay, newTask } = ctx
   const month = startOfMonth(date)
   const days = monthDays(month)
   const goals = goalsForMonth(tasks, month)
@@ -56,14 +56,14 @@ export default function MonthView({ ctx }) {
 
       <section>
         <div className="section-row">
-          <h2 className="section-title">Month goals</h2>
-          <button className="pill" onClick={() => newTask({ scope: 'month', date: month })}>+ Goal</button>
+          <h2 className="section-title">Month tasks</h2>
+          <button className="pill" onClick={() => newTask({ scope: 'month', date: month })}>+ Month task</button>
         </div>
         {goals.length ? (
           <div className="card list">
-            {goals.map(it => <TaskRow key={it.task.id} item={it} onToggle={() => toggle(it.task.id, it.key)} onOpen={() => openEditor(it.task)} />)}
+            {goals.map(it => <TaskRow key={it.task.id} item={it} goal={goalMap[it.task.goalId]} onToggle={() => toggle(it.task.id, it.key)} onOpen={() => openEditor(it.task)} />)}
           </div>
-        ) : <Empty>Bigger things to get done sometime this month go here.</Empty>}
+        ) : <Empty>Things to get done sometime this month, on no particular day.</Empty>}
       </section>
     </div>
   )

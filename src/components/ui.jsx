@@ -34,7 +34,7 @@ export function Bar({ label, p }) {
   )
 }
 
-export function TaskRow({ item, onToggle, onOpen, extra }) {
+export function TaskRow({ item, onToggle, onOpen, extra, goal }) {
   const { task, done } = item
   return (
     <div className={`task ${done ? 'is-done' : ''}`}>
@@ -53,6 +53,7 @@ export function TaskRow({ item, onToggle, onOpen, extra }) {
           {task.time && <span>{formatTime(task.time)}</span>}
           {task.repeat !== 'none' && task.scope === 'day' && <span title="Repeats">↻</span>}
           {task.remind != null && task.time && <span title="Reminder set">🔔</span>}
+          {goal && <span className="goal-tag ellipsis" style={{ '--c': listColor(goal.list) }}>◎ {goal.title}</span>}
           {task.notes && <span className="ellipsis">{task.notes}</span>}
         </span>
       </button>

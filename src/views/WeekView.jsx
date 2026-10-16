@@ -3,7 +3,7 @@ import { goalsForWeek, itemsForDay, listColor, progress, weekProgress } from '..
 import { Bar, Empty, Nav, TaskRow } from '../components/ui.jsx'
 
 export default function WeekView({ ctx }) {
-  const { tasks, settings, date, setDate, today, toggle, openEditor, goToDay, newTask } = ctx
+  const { tasks, settings, goalMap, date, setDate, today, toggle, openEditor, goToDay, newTask } = ctx
   const start = startOfWeek(date, settings.weekStartsOn)
   const goals = goalsForWeek(tasks, start)
   const isCurrent = start === startOfWeek(today, settings.weekStartsOn)
@@ -25,14 +25,14 @@ export default function WeekView({ ctx }) {
 
       <section>
         <div className="section-row">
-          <h2 className="section-title">Week goals</h2>
-          <button className="pill" onClick={() => newTask({ scope: 'week', date: start })}>+ Goal</button>
+          <h2 className="section-title">Week tasks</h2>
+          <button className="pill" onClick={() => newTask({ scope: 'week', date: start })}>+ Week task</button>
         </div>
         {goals.length ? (
           <div className="card list">
-            {goals.map(it => <TaskRow key={it.task.id} item={it} onToggle={() => toggle(it.task.id, it.key)} onOpen={() => openEditor(it.task)} />)}
+            {goals.map(it => <TaskRow key={it.task.id} item={it} goal={goalMap[it.task.goalId]} onToggle={() => toggle(it.task.id, it.key)} onOpen={() => openEditor(it.task)} />)}
           </div>
-        ) : <Empty>Bigger things to get done sometime this week go here.</Empty>}
+        ) : <Empty>Things to get done sometime this week, on no particular day.</Empty>}
       </section>
 
       <section>

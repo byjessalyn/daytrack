@@ -3,6 +3,7 @@ import { App as CapApp } from '@capacitor/app'
 import { EMPTY_DATA, loadData, saveData } from './lib/storage.js'
 import { syncNotifications, syncWidget, isNative } from './lib/native.js'
 import { makeTask, normaliseDate, toggleDone } from './lib/tasks.js'
+import { makeGoal } from './lib/goals.js'
 
 export function usePlanner() {
   const [data, setData] = useState(null) // null while loading
@@ -63,9 +64,24 @@ export function usePlanner() {
     ...d, tasks: d.tasks.map(t => (t.id === id ? { ...t, date: key, done: {} } : t)),
   })), [update])
 
+  const saveGoal = useCallback((fields) => update(d => {
+    const exists = d.goals.some(g => g.id === fields.id)
+    const goals = exists
+      ? d.goals.map(g => (g.id === fields.id ? { ...g, ...fields } : g))
+      : [...d.goals, makeGoal(fields)]
+    return { ...d, goals }
+  }), [update])
+
+  // Deleting a goal keeps its tasks; they just stop counting toward anything.
+  const deleteGoal = useCallback((id) => update(d => ({
+    ...d,
+    goals: d.goals.filter(g => g.id !== id),
+    tasks: d.tasks.map(t => (t.goalId === id ? { ...t, goalId: null } : t)),
+  })), [update])
+
   const setSettings = useCallback((patch) => update(d => ({ ...d, settings: { ...d.settings, ...patch } })), [update])
 
   const replaceAll = useCallback((next) => setData(next), [])
 
-  return { data, saveTask, deleteTask, toggle, moveTask, setSettings, replaceAll }
+  return { data, saveTask, deleteTask, toggle, moveTask, saveGoal, deleteGoal, setSettings, replaceAll }
 }

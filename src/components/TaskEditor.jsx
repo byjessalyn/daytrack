@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { LISTS, REMINDERS, REPEATS } from '../lib/tasks.js'
+import { DEFAULT_HABIT_TARGET } from '../lib/goals.js'
 
 const SCOPES = [
   { id: 'day', label: 'Day task' },
-  { id: 'week', label: 'Week goal' },
-  { id: 'month', label: 'Month goal' },
+  { id: 'week', label: 'Week task' },
+  { id: 'month', label: 'Month task' },
 ]
 
-export default function TaskEditor({ initial, onSave, onDelete, onClose, notificationsOn }) {
+export default function TaskEditor({ initial, goals = [], onSave, onDelete, onClose, notificationsOn }) {
   const [t, setT] = useState(initial)
   const titleRef = useRef(null)
   const isNew = !initial.id
@@ -87,6 +88,31 @@ export default function TaskEditor({ initial, onSave, onDelete, onClose, notific
         {t.scope === 'day' && !t.time && <p className="hint">Add a time to set a reminder.</p>}
         {t.scope === 'day' && t.time && t.remind != null && !notificationsOn && (
           <p className="hint">Turn on notifications in Settings to get this reminder.</p>
+        )}
+
+        {goals.length > 0 && (
+          <div className="field-grid">
+            <label className="field">
+              <span>Counts toward goal</span>
+              <select value={t.goalId || ''} onChange={e => set({ goalId: e.target.value || null })}>
+                <option value="">No goal</option>
+                {goals.map(g => <option key={g.id} value={g.id}>{g.title}</option>)}
+              </select>
+            </label>
+            {t.goalId && t.scope === 'day' && t.repeat !== 'none' && (
+              <label className="field">
+                <span>Habit target (times)</span>
+                <input
+                  type="number" inputMode="numeric" min="1" max="365"
+                  value={t.target ?? DEFAULT_HABIT_TARGET}
+                  onChange={e => set({ target: Math.max(1, Math.min(365, Number(e.target.value) || 1)) })}
+                />
+              </label>
+            )}
+          </div>
+        )}
+        {t.goalId && t.scope === 'day' && t.repeat === 'none' && (
+          <p className="hint">One-off task: counts as a step toward the goal. Set it to repeat to make it a habit.</p>
         )}
 
         <div className="field">

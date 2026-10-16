@@ -234,3 +234,33 @@ code { font-size: .9em; background: var(--track); padding: 1px 5px; border-radiu
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Goals */
+.goal { overflow: hidden; }
+.goal-head { display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px 16px; text-align: left; }
+.goal-head .ring-label strong { font-size: 14px; }
+.goal-head-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.goal-head-text strong { font-size: 17px; font-weight: 700; text-wrap: balance; }
+.goal-head .ring-fill { stroke: var(--c); }
+.goal-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; }
+.chev { font-size: 22px; color: var(--muted); width: 24px; text-align: center; }
+.goal-body { border-top: 1px solid var(--line); padding: 8px 16px 14px; display: flex; flex-direction: column; gap: 4px; }
+.goal-body .section-row { margin-top: 8px; }
+.goal-body .link-btn { align-self: flex-start; margin-top: 8px; font-weight: 600; }
+.goal-notes { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+.list.inset { background: var(--bg); border-radius: 12px; }
+.list.inset > * + * { border-top: 1px solid var(--line); }
+.habit-bar { display: flex; align-items: center; gap: 10px; padding: 0 14px 10px 50px; }
+.habit-bar .bar-track { flex: 1; margin: 0; }
+.habit-bar .bar-fill { background: var(--c, var(--accent)); }
+.nowrap { white-space: nowrap; }
+.status { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+.status.muted { background: var(--track); color: var(--muted); }
+.status.info { background: var(--accent-soft); color: var(--accent); }
+.status.good { background: color-mix(in srgb, var(--good) 16%, transparent); color: var(--good); }
+.status.warn { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+.status.bad { background: color-mix(in srgb, #DC2626 14%, transparent); color: #DC2626; }
+.goal-tag { color: var(--c); font-weight: 600; max-width: 60%; }
+.confirm-box { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; }
+.confirm-box p { margin: 0 0 10px; }
+.confirm-actions { display: flex; gap: 8px; justify-content: flex-end; }
