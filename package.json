@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "ios": "vite build && cap sync ios && cap open ios",
-    "widget:install": "sh scripts/install-widget.sh"
+    "widget:install": "sh scripts/install-widget.sh",
+    "build:artifact": "vite build --config vite.artifact.config.js && node scripts/make-artifact.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",

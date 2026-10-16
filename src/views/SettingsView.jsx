@@ -15,6 +15,7 @@ export default function SettingsView({ ctx }) {
   const s = data.settings
   const [perm, setPerm] = useState('prompt')
   const [msg, setMsg] = useState('')
+  const [pending, setPending] = useState(null) // backup waiting for confirmation
   const fileRef = useRef(null)
 
   useEffect(() => { notificationPermission().then(setPerm) }, [])
@@ -26,6 +27,15 @@ export default function SettingsView({ ctx }) {
     setSettings({ notifications: result === 'granted' })
     if (result !== 'granted') setMsg('Notifications are blocked. Turn them on in iPhone Settings → Daytrack → Notifications.')
     else setMsg('')
+  }
+
+  async function copyBackup() {
+    try {
+      await navigator.clipboard.writeText(exportJSON(data))
+      setMsg('Backup copied. Paste it into Notes or a file to keep it.')
+    } catch {
+      setMsg('Copying is blocked here. Use Export backup instead.')
+    }
   }
 
   function download() {
@@ -42,10 +52,8 @@ export default function SettingsView({ ctx }) {
     if (!file) return
     try {
       const next = importJSON(await file.text())
-      if (confirm(`Replace your current plan with ${next.tasks.length} tasks from this backup?`)) {
-        replaceAll(next)
-        setMsg('Backup restored.')
-      }
+      setPending(next)
+      setMsg('')
     } catch (err) {
       setMsg(err.message || 'Could not read that file.')
     }
@@ -107,7 +115,15 @@ export default function SettingsView({ ctx }) {
       <h2 className="section-title">Backup</h2>
       <div className="card list">
         <button className="row as-btn" onClick={download}>Export backup (.json)</button>
+        <button className="row as-btn" onClick={copyBackup}>Copy backup to clipboard</button>
         <button className="row as-btn" onClick={() => fileRef.current?.click()}>Restore from backup…</button>
+        {pending && (
+          <div className="row confirm-row">
+            <div>Replace your current plan with {pending.tasks.length} tasks from this backup?</div>
+            <button className="pill" onClick={() => setPending(null)}>Cancel</button>
+            <button className="pill danger" onClick={() => { replaceAll(pending); setPending(null); setMsg('Backup restored.') }}>Replace</button>
+          </div>
+        )}
         <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={upload} />
       </div>
       <p className="muted small center">Your plan is stored only on this device.</p>
